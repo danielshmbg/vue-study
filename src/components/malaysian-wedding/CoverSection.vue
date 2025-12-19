@@ -80,7 +80,7 @@ export default {
   inset: 0;
   height: 100%;
   background-image: url('https://res.cloudinary.com/dfht26lv6/image/upload/v1765707470/hero_page_desktop_vmaklm.png');
-  background-size: contain; /* show full image without cropping */
+  background-size: auto;
   background-position: center center;
   background-repeat: no-repeat;
   background-color: #f5f0e8; /* fallback color for empty areas */

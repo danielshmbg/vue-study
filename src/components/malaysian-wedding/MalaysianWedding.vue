@@ -1,16 +1,13 @@
 <template>
   <div class="malaysian-wedding" :class="{ 'invitation-opened': isInvitationOpen }">
-    <!-- Cover/Envelope -->
-    <transition name="fade">
-      <CoverSection 
-        v-if="!isInvitationOpen" 
-        @open-invitation="openInvitation"
-      />
-    </transition>
-
+    
+    <section class="invitation-content-section">
+      <!-- Cover/Envelope -->
+    <CoverSection class="cover-section" />
     <!-- Main Invitation Content -->
-    <transition name="slide-up">
-      <div v-if="isInvitationOpen" class="invitation-content">
+    <div class="invitation-content-container">
+      <transition name="slide-up">
+      <div class="invitation-content">
         <AudioPlayer />
         <HeroSection :scroll-y="scrollY" />
         <CoupleSection :scroll-y="scrollY" />
@@ -21,7 +18,10 @@
         <FooterSection />
       </div>
     </transition>
-
+    </div>
+     </section>
+    
+    
     <!-- Parallax Stars Background -->
     <div class="parallax-stars" :style="{ transform: `translateY(${scrollY * 0.3}px)` }">
       <div class="star" v-for="n in 50" :key="n" :style="getStarStyle(n)"></div>
@@ -60,17 +60,26 @@ export default {
     }
   },
   mounted() {
-    window.addEventListener('scroll', this.handleScroll)
+    // Listen to scroll on the invitation-content-container instead of window
+    this.$nextTick(() => {
+      const scrollContainer = this.$el.querySelector('.invitation-content-container')
+      if (scrollContainer) {
+        scrollContainer.addEventListener('scroll', this.handleScroll)
+      }
+    })
   },
   beforeUnmount() {
-    window.removeEventListener('scroll', this.handleScroll)
+    const scrollContainer = this.$el.querySelector('.invitation-content-container')
+    if (scrollContainer) {
+      scrollContainer.removeEventListener('scroll', this.handleScroll)
+    }
   },
   methods: {
     openInvitation() {
       this.isInvitationOpen = true
     },
-    handleScroll() {
-      this.scrollY = window.scrollY
+    handleScroll(event) {
+      this.scrollY = event.target.scrollTop
     },
     getStarStyle(n) {
       const seed = n * 137.5
@@ -95,6 +104,10 @@ export default {
   overflow-x: hidden;
   position: relative;
   background-image: url('https://res.cloudinary.com/dfht26lv6/image/upload/v1765707470/hero_page_desktop_vmaklm.png');
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  display: block;
 }
 
 .invitation-content {
@@ -102,8 +115,32 @@ export default {
   position: relative;
   z-index: 1;
   min-height: 100%;
-  max-width: 1080px;
   margin: 0 auto;
+}
+
+.invitation-content-section{
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  gap: 0;
+}
+
+.invitation-content-container{
+  width: 39%;
+  flex-shrink: 0;
+  overflow-y: auto;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.cover-section {
+  width: 61%;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* Parallax Petals Background */
@@ -146,10 +183,25 @@ export default {
   opacity: 0;
 }
 
-/* Responsive layout tweaks */
-@media (min-width: 768px) {
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .invitation-content-section {
+    flex-direction: column;
+  }
+  
+  .cover-section {
+    display: none;
+  }
+  
+  .invitation-content-container {
+    width: 100%;
+    height: 100vh;
+  }
+  
   .invitation-content {
-    padding: 2rem 2rem 4rem;
+    max-width: 100%;
+    padding: 0;
   }
 }
 
